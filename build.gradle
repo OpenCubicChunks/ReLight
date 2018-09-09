@@ -1,0 +1,36 @@
+buildscript {
+    dependencies {
+        classpath("gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1")
+    }
+}
+
+plugins {
+    id 'java'
+}
+apply plugin: "com.github.hierynomus.license"
+
+group 'io.github.opencubicchunks'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.mockito:mockito-core:2.21.0'
+}
+
+license {
+    ext.project = "ReLight"
+    exclude("**/*.info")
+    exclude("**/package-info.java")
+    exclude("**/*.json")
+    exclude("**/*.xml")
+    header = file("HEADER.txt")
+    ignoreFailures = false
+    strictCheck = true
+    mapping(java: "SLASHSTAR_STYLE")
+}
