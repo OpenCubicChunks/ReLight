@@ -21,6 +21,9 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile 'org.mockito:mockito-core:2.21.0'
+    // https://mvnrepository.com/artifact/com.pholser/junit-quickcheck-generators
+    testCompile group: 'com.pholser', name: 'junit-quickcheck-generators', version: '0.8.2'
+
 }
 
 license {

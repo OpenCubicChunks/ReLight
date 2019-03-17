@@ -24,6 +24,7 @@
 package io.github.opencubicchunks.relight.propagator;
 
 import io.github.opencubicchunks.relight.util.LightType;
+import io.github.opencubicchunks.relight.util.Vec3List;
 
 import java.util.EnumSet;
 
@@ -31,18 +32,28 @@ import java.util.EnumSet;
  * TODO: LightPropagator explanation
  */
 public interface LightPropagator {
+
+    /**
+     * Maximum possible light value. LightPropagator may assume that no higher value is ever returned as light source
+     */
+    int MAX_VALUE = 15;
+
+    /**
+     * Minimum possible light value. LightPropagator may assume that no lower value is ever returned as light source
+     */
+    int MIN_VALUE = 0;
+
     /**
      * Adds coordinates to be updated.
      */
-    void add(int x, int y, int z, EnumSet<LightType> types);
+    void update(Vec3List posList, EnumSet<LightType> types);
 
     /**
      * After this method returns, all previously added coordinates must be already updated.
      */
-    void update();
-
-    default void updateNow(int x, int y, int z, EnumSet<LightType> types) {
-        add(x, y, z, types);
-        update();
+    default void update(int blockX, int blockY, int blockZ, EnumSet<LightType> types) {
+        Vec3List list = new Vec3List(1);
+        list.add(blockX, blockY, blockZ);
+        update(list, types);
     }
 }

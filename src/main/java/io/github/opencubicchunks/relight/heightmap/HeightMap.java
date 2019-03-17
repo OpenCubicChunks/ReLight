@@ -25,6 +25,4 @@ package io.github.opencubicchunks.relight.heightmap;
 
 public interface HeightMap {
     int getTopY(int localX, int localZ);
-
-
 }

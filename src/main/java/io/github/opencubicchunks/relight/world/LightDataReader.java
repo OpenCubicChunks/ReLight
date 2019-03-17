@@ -27,6 +27,8 @@ import io.github.opencubicchunks.relight.util.LightType;
 
 public interface LightDataReader {
 
+    int getLight(int x, int y, int z, LightType type);
+
     int getLightSource(int x, int y, int z, LightType type);
 
 }

@@ -21,38 +21,8 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package io.github.opencubicchunks.relight.world;
+package io.github.opencubicchunks.relight.util;
 
-import io.github.opencubicchunks.relight.heightmap.HeightMap;
-import io.github.opencubicchunks.relight.util.ChunkPos;
-import io.github.opencubicchunks.relight.util.ColumnPos;
+public class PosUtil {
 
-import java.util.List;
-
-/**
- * Provides light data readers and writers optimized for specified chunk coordinate ranges
- */
-public interface WorldAccess {
-
-    // light access
-    LightDataReader getLightChunk(ChunkPos minPos, ChunkPos maxPos);
-
-    LightDataWriter getWriterFor(ChunkPos minPos, ChunkPos maxPos);
-
-    // height map
-    HeightMap getHeightMap(ColumnPos pos);
-
-    // chunk access
-    boolean isChunkLoaded(int chunkX, int chunkY, int chunkZ);
-
-    default boolean isChunkLoaded(ChunkPos pos) {
-        return isChunkLoaded(pos.getX(), pos.getY(), pos.getZ());
-    }
-
-    LightChunk getLightChunk(ChunkPos pos);
-
-    /**
-     * Returns an ordered list of all chunks in the given chunk height range
-     */
-    List<LightChunk> chunksBetween(int start, int end);
 }

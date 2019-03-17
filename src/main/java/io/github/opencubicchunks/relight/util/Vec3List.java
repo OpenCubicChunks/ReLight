@@ -21,38 +21,50 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package io.github.opencubicchunks.relight.world;
+package io.github.opencubicchunks.relight.util;
 
-import io.github.opencubicchunks.relight.heightmap.HeightMap;
-import io.github.opencubicchunks.relight.util.ChunkPos;
-import io.github.opencubicchunks.relight.util.ColumnPos;
+import java.util.Arrays;
 
-import java.util.List;
+public class Vec3List {
 
-/**
- * Provides light data readers and writers optimized for specified chunk coordinate ranges
- */
-public interface WorldAccess {
+    private int[] coords;
 
-    // light access
-    LightDataReader getLightChunk(ChunkPos minPos, ChunkPos maxPos);
+    private int ptr = 0;
+    private int readPtr = -3;
 
-    LightDataWriter getWriterFor(ChunkPos minPos, ChunkPos maxPos);
-
-    // height map
-    HeightMap getHeightMap(ColumnPos pos);
-
-    // chunk access
-    boolean isChunkLoaded(int chunkX, int chunkY, int chunkZ);
-
-    default boolean isChunkLoaded(ChunkPos pos) {
-        return isChunkLoaded(pos.getX(), pos.getY(), pos.getZ());
+    public Vec3List(int initSize) {
+        if (initSize <= 0) {
+            throw new IllegalArgumentException("initSize must be positive but got " + initSize);
+        }
+        this.coords = new int[initSize * 3];
     }
 
-    LightChunk getLightChunk(ChunkPos pos);
+    public void add(int x, int y, int z) {
+        if (this.ptr >= this.coords.length) {
+            this.coords = Arrays.copyOf(this.coords, this.coords.length * 2);
+            assert this.coords.length % 3 == 0;
+        }
+        assert this.ptr % 3 == 0;
+        this.coords[ptr++] = x;
+        this.coords[ptr++] = y;
+        this.coords[ptr++] = z;
+    }
 
-    /**
-     * Returns an ordered list of all chunks in the given chunk height range
-     */
-    List<LightChunk> chunksBetween(int start, int end);
+    public boolean next() {
+        readPtr += 3;
+        return readPtr < ptr;
+    }
+
+    public int getX() {
+        return this.coords[readPtr];
+    }
+
+    public int getY() {
+        return this.coords[readPtr + 1];
+    }
+
+    public int getZ() {
+        return this.coords[readPtr + 2];
+    }
+
 }

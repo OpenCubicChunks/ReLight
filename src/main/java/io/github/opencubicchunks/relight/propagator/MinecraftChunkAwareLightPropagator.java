@@ -24,20 +24,17 @@
 package io.github.opencubicchunks.relight.propagator;
 
 import io.github.opencubicchunks.relight.util.LightType;
+import io.github.opencubicchunks.relight.util.Vec3List;
 
 import java.util.EnumSet;
 
 public class MinecraftChunkAwareLightPropagator implements LightPropagator {
 
-    @Override public void add(int x, int y, int z, EnumSet<LightType> types) {
+    @Override public void update(Vec3List posList, EnumSet<LightType> types) {
 
     }
 
-    @Override public void update() {
-
-    }
-
-    @Override public void updateNow(int x, int y, int z, EnumSet<LightType> types) {
+    @Override public void update(int blockX, int blockY, int blockZ, EnumSet<LightType> types) {
 
     }
 }

@@ -23,15 +23,23 @@
  */
 package io.github.opencubicchunks.relight.handler;
 
-import io.github.opencubicchunks.relight.testutil.TestUtils;
-import io.github.opencubicchunks.relight.world.ChunkLayout;
+import io.github.opencubicchunks.relight.util.BlockPos;
+import io.github.opencubicchunks.relight.util.ChunkPos;
 import org.junit.Test;
+
+import java.util.Set;
 
 public class TestFirstLightHandler {
 
+    // TODO: tests
     @Test
     public void testEmptyCubicChunksFullyLit() {
-        ChunkLayout cubicChunksLayout = TestUtils.cubicChunksLayout();
+    }
+
+    private void doTest(Set<ChunkPos> preLoadedChunks,
+        Set<ChunkPos> newChunks,
+        Set<BlockPos> oldOpaqueBlocks,
+        Set<BlockPos> newOpaqueBlocks) {
 
     }
 }

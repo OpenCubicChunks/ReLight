@@ -23,6 +23,7 @@
  */
 package io.github.opencubicchunks.relight.propagator;
 
+import io.github.opencubicchunks.relight.util.Vec3List;
 import io.github.opencubicchunks.relight.world.LightDataReader;
 import io.github.opencubicchunks.relight.world.LightDataWriter;
 import io.github.opencubicchunks.relight.util.LightType;
@@ -39,13 +40,14 @@ public class NoopLightPropagator implements LightPropagator {
         this.writer = writer;
     }
 
-    @Override public final void add(int x, int y, int z, EnumSet<LightType> types) {
-        for (LightType type : types) {
-            writer.setLight(x, y, z, reader.getLightSource(x, y, z, type), type);
+    @Override public void update(Vec3List posList, EnumSet<LightType> types) {
+        while (posList.next()) {
+            int x = posList.getX();
+            int y = posList.getY();
+            int z = posList.getZ();
+            for (LightType type : types) {
+                writer.setLight(x, y, z, reader.getLightSource(x, y, z, type), type);
+            }
         }
-    }
-
-    @Override public final void update() {
-        // no-op, already updated by add()
     }
 }

@@ -23,36 +23,28 @@
  */
 package io.github.opencubicchunks.relight.world;
 
-import io.github.opencubicchunks.relight.heightmap.HeightMap;
-import io.github.opencubicchunks.relight.util.ChunkPos;
-import io.github.opencubicchunks.relight.util.ColumnPos;
+import io.github.opencubicchunks.relight.util.LightType;
 
-import java.util.List;
+public interface LightChunk {
 
-/**
- * Provides light data readers and writers optimized for specified chunk coordinate ranges
- */
-public interface WorldAccess {
+    int getLight(int x, int y, int z, LightType type);
 
-    // light access
-    LightDataReader getLightChunk(ChunkPos minPos, ChunkPos maxPos);
-
-    LightDataWriter getWriterFor(ChunkPos minPos, ChunkPos maxPos);
-
-    // height map
-    HeightMap getHeightMap(ColumnPos pos);
-
-    // chunk access
-    boolean isChunkLoaded(int chunkX, int chunkY, int chunkZ);
-
-    default boolean isChunkLoaded(ChunkPos pos) {
-        return isChunkLoaded(pos.getX(), pos.getY(), pos.getZ());
-    }
-
-    LightChunk getLightChunk(ChunkPos pos);
+    int getLightSource(int x, int y, int z, LightType type);
 
     /**
-     * Returns an ordered list of all chunks in the given chunk height range
+     * Returns opacity between block locations (for for Minecraft 1.14+).
      */
-    List<LightChunk> chunksBetween(int start, int end);
+    int getOpacityBetween(int fromX, int fromY, int fromZ, int toX, int toY, int toZ);
+
+    /**
+     * Returns the base opacity of a given block. Should only be used for heightmap.
+     * {@link #getOpacityBetween(int, int, int, int, int, int)} should be used otherwise.
+     */
+    int getOpacity(int blockX, int blockY, int blockZ);
+
+    int getX();
+
+    int getY();
+
+    int getZ();
 }

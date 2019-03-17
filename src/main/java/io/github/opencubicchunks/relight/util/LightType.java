@@ -23,6 +23,23 @@
  */
 package io.github.opencubicchunks.relight.util;
 
+import io.github.opencubicchunks.relight.propagator.LightPropagator;
+
 public enum LightType {
-    SKY, BLOCK
+    SKY(LightPropagator.MIN_VALUE),
+    BLOCK(LightPropagator.MIN_VALUE);
+
+    private final int defaultValue;
+
+    LightType(int defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    // TODO: reconsider if it will ever be used with nonzero return value
+    /**
+     * Returns default light value for unloaded areas.
+     */
+    public int defaultValue() {
+        return defaultValue;
+    }
 }

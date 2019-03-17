@@ -21,12 +21,30 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package io.github.opencubicchunks.relight.testutil;
+package io.github.opencubicchunks.relight.util;
 
-import io.github.opencubicchunks.relight.world.ChunkLayout;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class TestUtils {
-    public static ChunkLayout cubicChunksLayout() {
-        return ChunkLayout.builder().setChunkSize(16).createChunkLayout();
+import org.junit.Test;
+
+public class Vec3ListTest {
+
+    @Test
+    public void testEmpty() {
+        Vec3List obj = new Vec3List(1);
+        assertFalse(obj.next());
+    }
+
+    @Test
+    public void testSingle() {
+        Vec3List obj = new Vec3List(1);
+        obj.add(1, 2, 3);
+        assertTrue(obj.next());
+        assertEquals(1, obj.getX());
+        assertEquals(2, obj.getY());
+        assertEquals(3, obj.getZ());
+        assertFalse(obj.next());
     }
 }

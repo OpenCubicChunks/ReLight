@@ -21,32 +21,26 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package io.github.opencubicchunks.relight.testutil;
+package io.github.opencubicchunks.relight.heightmap;
 
-import io.github.opencubicchunks.relight.util.LightType;
-import io.github.opencubicchunks.relight.world.LightDataReader;
-import io.github.opencubicchunks.relight.world.LightDataWriter;
-import io.github.opencubicchunks.relight.world.WorldAccess;
+import java.util.Arrays;
 
-public class TestWorldAccess implements WorldAccess, LightDataWriter, LightDataReader {
+public class ColumnHeights implements HeightMap {
+    private final int[] heights = new int[16 * 16];
 
-    @Override public LightDataReader getReaderFor(int minChunkX, int minChunkY, int minChunkZ, int maxChunkX, int maxChunkY, int maxChunkZ) {
-        return this;
+    public ColumnHeights() {
+        Arrays.fill(this.heights, Integer.MIN_VALUE);
     }
 
-    @Override public LightDataWriter getWriterFor(int minChunkX, int minChunkY, int minChunkZ, int maxChunkX, int maxChunkY, int maxChunkZ) {
-        return this;
+    public int getTopY(int localX, int localZ) {
+        return this.heights[localX | localZ << 4];
     }
 
-    @Override public boolean isChunkLoaded(int chunkX, int chunkY, int chunkZ) {
-        //todo: implement;
+    public void setHeight(int localX, int localZ, int newVal) {
+        this.heights[localX | localZ << 4] = newVal;
     }
 
-    @Override public int getLightSource(int x, int y, int z, LightType type) {
-        return 0;
-    }
-
-    @Override public void setLight(int x, int y, int z, int value, LightType type) {
-
+    public boolean exists(int localX, int localZ) {
+        return getTopY(localX, localZ) != Integer.MIN_VALUE;
     }
 }
