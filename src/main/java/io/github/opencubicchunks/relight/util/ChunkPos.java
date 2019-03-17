@@ -24,6 +24,8 @@
 package io.github.opencubicchunks.relight.util;
 
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class ChunkPos {
 
@@ -111,12 +113,22 @@ public class ChunkPos {
         return minBlockX() + dx;
     }
 
-    public int blockY(int dz) {
-        return minBlockY() + y;
+    public int blockY(int dy) {
+        return minBlockY() + dy;
     }
 
     public int blockZ(int dz) {
         return minBlockZ() + dz;
+    }
+
+    public void forAllBlocks(Consumer<BlockPos> consumer) {
+        for (int dx = 0; dx < 16; dx++) {
+            for (int dy = 0; dy < 16; dy++) {
+                for (int dz = 0; dz < 16; dz++) {
+                    consumer.accept(new BlockPos(minBlockX() + dx, minBlockY() + dy, minBlockZ() + dz));
+                }
+            }
+        }
     }
 
     public ColumnPos toColumn() {

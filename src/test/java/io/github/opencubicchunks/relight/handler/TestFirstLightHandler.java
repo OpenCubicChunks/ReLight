@@ -37,8 +37,6 @@ import java.util.Random;
 import java.util.Set;
 
 public class TestFirstLightHandler {
-
-    // TODO: tests
     @Test
     public void testEmptyCubicChunksFullyLit() {
         Random rand = new Random(42);
@@ -66,6 +64,14 @@ public class TestFirstLightHandler {
                 );
                 oldOpaqueBlocks.add(block);
             }
+            for (int i = 0; i < 10; i++) {
+                BlockPos block = new BlockPos(
+                    pos.minBlockX() + rand.nextInt(16),
+                    pos.minBlockY() + rand.nextInt(16),
+                    pos.minBlockZ() + rand.nextInt(16)
+                );
+                oldBlockLightSources.add(block);
+            }
         }
         for (ChunkPos pos : newChunks) {
             for (int i = 0; i < 200; i++) {
@@ -76,7 +82,16 @@ public class TestFirstLightHandler {
                 );
                 newOpaqueBlocks.add(block);
             }
+            for (int i = 0; i < 10; i++) {
+                BlockPos block = new BlockPos(
+                    pos.minBlockX() + rand.nextInt(16),
+                    pos.minBlockY() + rand.nextInt(16),
+                    pos.minBlockZ() + rand.nextInt(16)
+                );
+                newBlockLightSources.add(block);
+            }
         }
+        doTest(preLoadedChunks, newChunks, oldOpaqueBlocks, newOpaqueBlocks, oldBlockLightSources, newBlockLightSources);
     }
 
     private void doTest(Set<ChunkPos> preLoadedChunks,
@@ -91,11 +106,13 @@ public class TestFirstLightHandler {
 
         FirstLightHandler handler = new FirstLightHandler(worldAccess);
 
-        Vec3List updatedBlocks = new Vec3List(100000);
-        handler.apply(newChunks, updatedBlocks);
+        Vec3List updatedSky = new Vec3List(100000);
+        Vec3List updatedBlock = new Vec3List(100000);
+        handler.apply(newChunks, updatedSky, updatedBlock);
 
         NoopLightPropagator propagator = new NoopLightPropagator(worldAccess, worldAccess);
-        propagator.update(updatedBlocks, EnumSet.of(LightType.SKY));
+        propagator.update(updatedSky, EnumSet.of(LightType.SKY));
+        propagator.update(updatedBlock, EnumSet.of(LightType.BLOCK));
 
         worldAccess.verifyLight();
     }

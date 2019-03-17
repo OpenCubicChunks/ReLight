@@ -46,6 +46,18 @@ public class BlockPos {
         return z;
     }
 
+    public int localX() {
+        return this.x & 0xF;
+    }
+
+    public int localY() {
+        return this.y & 0xF;
+    }
+
+    public int localZ() {
+        return this.z & 0xF;
+    }
+
     public BlockPos add(BlockPos other) {
         return new BlockPos(this.x + other.x, this.y + other.y, this.z + other.z);
     }

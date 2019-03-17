@@ -52,17 +52,15 @@ public class FirstLightHandler {
     /**
      * Calculates list of block positions to update. Does not modify the heightmap.
      */
-    public void apply(Collection<ChunkPos> chunks, Vec3List output) {
-        chunks.forEach(chunkPos -> {
-            addAllThisChunk(chunkPos, output);
-        });
+    public void apply(Collection<ChunkPos> chunks, Vec3List outputSky, Vec3List outputBlock) {
+        chunks.forEach(chunkPos -> addAllThisChunk(chunkPos, outputSky, outputBlock));
         Map<ColumnPos, List<ChunkPos>> byColumn = chunks.stream().collect(groupingBy(ChunkPos::toColumn, toList()));
         byColumn.values().forEach(list -> list.sort((a, b) -> b.getY() - a.getY())); // sort highest to lowest
 
         Map<ColumnPos, ColumnHeights> columnHeights = new HashMap<>();
         byColumn.forEach((pos, cubes) -> columnHeights.put(pos, getHeights(cubes)));
 
-        addHeightDiff(output, columnHeights);
+        addHeightDiff(outputSky, columnHeights);
     }
 
     private void addHeightDiff(Vec3List output, Map<ColumnPos, ColumnHeights> columnHeights) {
@@ -85,7 +83,7 @@ public class FirstLightHandler {
 
                     int blockX = pos.blockX(dx);
                     int blockZ = pos.blockZ(dz);
-                    dataAccess.chunksBetween(minY >> 4, maxY >> 4).forEach(chunk -> {
+                    dataAccess.chunksBetween(pos, minY >> 4, maxY >> 4).forEach(chunk -> {
                         int chunkY = chunk.getY();
                         int chunkMinY = chunkY << 4;
                         int chunkMaxY = chunkMinY + 15;
@@ -127,12 +125,16 @@ public class FirstLightHandler {
         return heights;
     }
 
-    private void addAllThisChunk(ChunkPos chunkPos, Vec3List output) {
+    private void addAllThisChunk(ChunkPos chunkPos, Vec3List outputSky, Vec3List outputBlock) {
         for (int dx = 0; dx < 16; dx++) {
             for (int dy = 0; dy < 16; dy++) {
                 for (int dz = 0; dz < 16; dz++) {
                     // TODO: benchmark: does it make sense to check if it's opaque here, or leave it for propagator?
-                    output.add(chunkPos.blockX(dx), chunkPos.blockY(dy), chunkPos.blockZ(dz));
+                    int x = chunkPos.blockX(dx);
+                    int y = chunkPos.blockY(dy);
+                    int z = chunkPos.blockZ(dz);
+                    outputSky.add(x, y, z);
+                    outputBlock.add(x, y, z);
                 }
             }
         }

@@ -52,7 +52,7 @@ public interface WorldAccess {
     LightChunk getLightChunk(ChunkPos pos);
 
     /**
-     * Returns an ordered list of all chunks in the given chunk height range
+     * Returns an ordered list of all chunks in the given chunk height range from a given column
      */
-    List<LightChunk> chunksBetween(int start, int end);
+    List<LightChunk> chunksBetween(ColumnPos pos, int start, int end);
 }

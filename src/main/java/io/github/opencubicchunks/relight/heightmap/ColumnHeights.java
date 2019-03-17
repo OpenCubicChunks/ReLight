@@ -23,21 +23,13 @@
  */
 package io.github.opencubicchunks.relight.heightmap;
 
-import io.github.opencubicchunks.relight.util.BlockPos;
-
 import java.util.Arrays;
-import java.util.Map;
 
 public class ColumnHeights implements HeightMap {
     private final int[] heights = new int[16 * 16];
 
     public ColumnHeights() {
         Arrays.fill(this.heights, Integer.MIN_VALUE);
-    }
-
-    public ColumnHeights(Map<BlockPos, Integer> map) {
-        this();
-        map.forEach((pos, height) -> setHeight(pos.getX() & 0xF, pos.getZ() & 0xF, height));
     }
 
     public int getTopY(int localX, int localZ) {

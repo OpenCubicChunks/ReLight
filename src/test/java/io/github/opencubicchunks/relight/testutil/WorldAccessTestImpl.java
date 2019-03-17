@@ -25,11 +25,13 @@ package io.github.opencubicchunks.relight.testutil;
 
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.maxBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
+import static org.junit.Assert.assertEquals;
 
 import io.github.opencubicchunks.relight.heightmap.ColumnHeights;
 import io.github.opencubicchunks.relight.heightmap.HeightMap;
@@ -57,6 +59,8 @@ public class WorldAccessTestImpl implements WorldAccess, LightDataWriter, LightD
     // this test world access has no real concept of chunks, so simulatye them being loaded
     private final Set<ChunkPos> loadedChunks = new HashSet<>();
     private final Set<ColumnPos> loadedColumns;
+    private final Set<ChunkPos> newChunks;
+
 
     private final Map<BlockPos, Integer> heightmap;
     private final Map<BlockPos, Integer> blocklightSrc;
@@ -73,6 +77,10 @@ public class WorldAccessTestImpl implements WorldAccess, LightDataWriter, LightD
 
         this.loadedChunks.addAll(preLoadedChunks);
         this.loadedChunks.addAll(newChunks);
+        this.newChunks = newChunks;
+
+        this.heightmaps =
+            this.loadedChunks.stream().collect(groupingBy(ChunkPos::toColumn, collectingAndThen(counting(), cnt -> new ColumnHeights())));
 
         this.loadedColumns = this.loadedChunks.stream().map(ChunkPos::toColumn).collect(Collectors.toSet());
 
@@ -81,12 +89,7 @@ public class WorldAccessTestImpl implements WorldAccess, LightDataWriter, LightD
                 collectingAndThen(maxBy(comparingInt(BlockPos::getY)), p -> p.map(BlockPos::getY).get())
             )
         );
-        this.heightmaps = this.heightmap.entrySet().stream().collect(
-            groupingBy(e -> e.getKey().columnPos(), collectingAndThen(
-                toMap(Map.Entry::getKey, Map.Entry::getValue),
-                ColumnHeights::new
-            ))
-        );
+        this.heightmap.forEach((pos, height) -> heightmaps.get(pos.columnPos()).setHeight(pos.localX(), pos.localZ(), height));
 
         this.blocklightSrc = concat(oldBlockLightSources.stream(), newBlockLightSources.stream()).collect(toMap(p -> p, p -> 15));
 
@@ -108,7 +111,15 @@ public class WorldAccessTestImpl implements WorldAccess, LightDataWriter, LightD
     }
 
     public void verifyLight() {
-        // TODO: verify
+        newChunks.forEach(chunk -> chunk.forAllBlocks(this::verifyPosLight));
+    }
+
+    private void verifyPosLight(BlockPos pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        assertEquals("Blocklight at " + pos, getLightSource(x, y, z, LightType.BLOCK), getLight(x, y, z, LightType.BLOCK));
+        assertEquals("Skylight at " + pos, getLightSource(x, y, z, LightType.SKY), getLight(x, y, z, LightType.SKY));
     }
 
     private void verifyChunkLoaded(int x, int y, int z) {
@@ -125,13 +136,13 @@ public class WorldAccessTestImpl implements WorldAccess, LightDataWriter, LightD
 
     @Override public int getLight(int x, int y, int z, LightType type) {
         verifyChunkLoaded(x, y, z);
-        return (type == LightType.SKY ? this.skylight : this.blocklight).get(new BlockPos(x, y, z));
+        return (type == LightType.SKY ? this.skylight : this.blocklight).getOrDefault(new BlockPos(x, y, z), 0);
     }
 
     @Override public int getLightSource(int x, int y, int z, LightType type) {
         if (type == LightType.BLOCK) {
             verifyChunkLoaded(x, y, z);
-            return this.blocklightSrc.get(new BlockPos(x, y, z));
+            return this.blocklightSrc.getOrDefault(new BlockPos(x, y, z), 0);
         } else {
             verifyColumnLoaded(x, z);
             return y > this.heightmap.getOrDefault(new BlockPos(x, 0, z), Integer.MIN_VALUE) ? 15 : 0;
@@ -152,6 +163,9 @@ public class WorldAccessTestImpl implements WorldAccess, LightDataWriter, LightD
     }
 
     @Override public HeightMap getHeightMap(ColumnPos pos) {
+        if (!loadedColumns.contains(pos)) {
+            throw new IllegalArgumentException("Column at " + pos + " is not loaded!");
+        }
         return heightmaps.get(pos);
     }
 
@@ -166,8 +180,8 @@ public class WorldAccessTestImpl implements WorldAccess, LightDataWriter, LightD
         return new LightChunkTestImpl(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    @Override public List<LightChunk> chunksBetween(int start, int end) {
-        return loadedChunks.stream().filter(this::isChunkLoaded).map(this::getLightChunk).collect(toList());
+    @Override public List<LightChunk> chunksBetween(ColumnPos pos, int start, int end) {
+        return loadedChunks.stream().filter(p -> p.toColumn().equals(pos)).filter(this::isChunkLoaded).map(this::getLightChunk).collect(toList());
     }
 
     private class LightChunkTestImpl implements LightChunk {
